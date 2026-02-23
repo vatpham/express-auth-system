@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Auth System</title>
+</head>
+
+<body>
+    <div>
+        <h1>Dashboard</h1>
+        <button onclick="getUsers()">Load Users</button>
+        <button onclick="logout()">Logout</button>
+
+        <ul id="userList"></ul>
+    </div>
+
+    <script src="app.js">
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+
+</html>
