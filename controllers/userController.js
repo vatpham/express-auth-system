@@ -8,11 +8,19 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
-        await pool.query(
+        const result = await pool.query(
             "INSERT INTO users (username, password) VALUES (?, ?)",
             [username, hashedPassword]
         );
-        req.json({ message: "User created" });
+
+        const token = jwt.sign(
+            { id: Number(result.insertId) },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        res.json({ token });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
