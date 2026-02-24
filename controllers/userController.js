@@ -5,9 +5,18 @@ const jwt = require("jsonwebtoken");
 exports.register = async (req, res) => {
     const { username, password } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     try {
+        const existingUser = await pool.query(
+            "SELECT * FROM users WHERE username = ?",
+            [username]
+        );
+
+        if (existingUser.length > 0) {
+            return res.status(400).json({ error: "Username is taken" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const result = await pool.query(
             "INSERT INTO users (username, password) VALUES (?, ?)",
             [username, hashedPassword]
@@ -52,7 +61,7 @@ exports.login = async (req, res) => {
         { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
-    res.json({ token });
+    res.json({ token, role: user.role });
 };
 
 exports.getUsers = async (req, res) => {
@@ -60,10 +69,40 @@ exports.getUsers = async (req, res) => {
     res.json(users);
 };
 
+exports.updateUser = async (req, res) => {
+    const { id } = req.params;
+    const { username, role } = req.body;
+
+    try {
+        const existingUser = await pool.query(
+            "SELECT * FROM users WHERE username = ? AND id != ?",
+            [username, id]
+        );
+
+        if (existingUser.length > 0) {
+            return res.status(400).json({ error: "Username already taken" });
+        }
+
+        await pool.query(
+            "UPDATE users SET username = ?, role = ? WHERE id = ?",
+            [username, role, id]
+        );
+
+        res.json({ message: "User updated successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 exports.deleteUser = async (req, res) => {
     const { id } = req.params;
-    await pool.query("DELETE FROM users WHERE id = ?", [id]);
-    res.json({ message: "User deleted" });
+
+    try {
+        await pool.query("DELETE FROM users WHERE id = ?", [id]);
+        res.json({ message: "User deleted" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
 

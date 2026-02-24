@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Auth System</title>
+</head>
+
+<body>
+
+    <div>
+        <h1>Admin Panel</h1>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+
+    <div>
+        <h2>Manage Users</h2>
+        <button class="btn" onclick="loadAdminUsers()">Refresh</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="userTableBody">
+            <tr>
+                <td colspan="4">Loading users...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <div>
+            <h2>Edit User</h2>
+            <p id="currentEditingUser"></p>
+        </div>
+
+        <div>
+            <label for="editUsername">Username</label>
+            <input type="text" id="editUsername" placeholder="Enter username">
+        </div>
+
+        <div>
+            <label for="editRole">Role</label>
+            <select id="editRole">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <button onclick="saveUser()">Save Changes</button>
+    </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        } else {
+            loadAdminUsers();
+        }
+    </script>
+</body>
+
+</html>
